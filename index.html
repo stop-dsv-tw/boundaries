@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="說不也可以">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+<title>說不，也可以</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+  :root{--bg:#000;--ink:#fff;--muted:#a8a8a8;--line:#262626;--them:#262626;--me:#3797f0;--field:#1a1a1a;--card:#121212;--safe:#58c322;--soft:#b39ddb;--warn:#ed4956;--gold:#ffd60a;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system,'Noto Sans TC',sans-serif;background:radial-gradient(900px 500px at 50% -10%,#15151a 0%,#000 60%);color:var(--ink);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;padding-top:max(18px,env(safe-area-inset-top));padding-bottom:max(18px,env(safe-area-inset-bottom));}
+  .phoneframe{width:100%;max-width:412px;background:#000;border-radius:40px;padding:9px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1.5px #2a2a2e;position:relative;}
+  .wrap{width:100%;height:min(820px,88vh);background:#000;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:120px;height:24px;background:#000;border-radius:0 0 16px 16px;z-index:60;}
+  #cover{height:100%;overflow-y:hidden;display:flex;flex-direction:column;justify-content:center;padding:20px 0;}
+  #gate{height:100%;overflow-y:auto;display:flex;flex-direction:column;}
+  .gatebox{flex:1;display:flex;flex-direction:column;justify-content:center;padding:26px 24px;}
+  .gateicon{font-size:30px;text-align:center;margin-bottom:7px;}
+  .gatetitle{font-size:19px;font-weight:900;text-align:center;margin-bottom:12px;}
+  .gatetext{font-size:13px;color:#c7c7cc;line-height:1.65;margin-bottom:9px;}
+  .gatetext b{color:#fff;}
+  .gatewarn{background:rgba(237,73,86,.1);border:1px solid rgba(237,73,86,.35);border-radius:11px;padding:12px;font-size:12.5px;line-height:1.65;color:#eaf0f6;margin:4px 0 11px;}
+  .gatewarn b{color:var(--warn);}
+  .gatefields{margin:6px 0 4px;}
+  .gq{font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:7px;}
+  .gateinput{width:100%;background:var(--field);border:1.5px solid #2c2c2e;border-radius:11px;padding:11px 13px;font-size:14px;color:#fff;font-family:inherit;margin-bottom:13px;}
+  .gateinput:focus{outline:none;border-color:var(--safe);}
+  .gateinput::placeholder{color:#6c6c70;}
+  .cover{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;padding:0 26px 14px;}
+  .cover .kick{font-size:11px;letter-spacing:4px;color:var(--muted);font-weight:700;margin-bottom:10px;}
+  .cover h1{font-size:34px;font-weight:900;line-height:1.15;margin-bottom:14px;}
+  .cover h1 .em{color:var(--safe);}
+  .cover .lede{font-size:14px;color:#c7c7cc;line-height:1.7;margin-bottom:7px;}
+  .cover .lede b{color:#fff;font-weight:700;}
+  .selblock{padding:0 28px 0;}
+  .selblock .q{font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:8px;}
+  .opts{display:flex;gap:8px;margin-bottom:16px;}
+  .opt{flex:1;background:var(--field);border:1.5px solid transparent;border-radius:13px;padding:11px 6px;text-align:center;cursor:pointer;transition:.15s;font-family:inherit;color:var(--ink);}
+  .opt .ic{font-size:19px;display:block;margin-bottom:3px;}
+  .opt .lb{font-size:12.5px;font-weight:600;}
+  .opt:active{transform:scale(.96);}
+  .opt.on{border-color:var(--safe);background:rgba(48,209,88,.12);}
+  .startbtn{width:100%;background:#fff;color:#000;border:none;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:.25;pointer-events:none;transition:.2s;}
+  .startbtn.ready{opacity:1;pointer-events:auto;}
+  .applist{display:none;flex-direction:column;flex:1;height:100%;overflow-y:auto;}
+  .applist.active{display:flex;}
+  .listhead{padding:40px 20px 14px;border-bottom:1px solid var(--line);position:relative;}
+  .listhead h2{font-size:28px;font-weight:900;}
+  .listhead .who{font-size:12px;color:var(--muted);margin-top:3px;}
+  .listhead .chg{position:absolute;right:18px;top:56px;background:none;border:none;color:var(--me);font-size:14px;cursor:pointer;font-family:inherit;}
+  .listnote{padding:14px 20px;font-size:12.5px;color:var(--muted);line-height:1.8;border-bottom:1px solid var(--line);}
+  .listnote b{color:#fff;}
+  .chatrow{display:flex;align-items:center;gap:13px;padding:14px 18px;cursor:pointer;border-bottom:1px solid var(--line);transition:.12s;}
+  .chatrow:active{background:#0e0e0e;}
+  .chatrow .av{width:50px;height:50px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#3a3a3c,#1c1c1e);}
+  .chatrow .ct{flex:1;min-width:0;}
+  .chatrow .ct .nm{font-size:15px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .chatrow .ct .pv{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .chatrow .tag{font-size:10px;color:var(--muted);font-weight:400;}
+  .chatrow.done .ct .nm::after{content:'✓';font-size:11px;color:var(--safe);}
+  .chatrow.summary{border-top:1px solid var(--line);background:#0a0a0a;}
+  .chatrow.summary.locked{opacity:.55;cursor:default;}
+  .chatrow.summary .av{background:linear-gradient(135deg,#3a2f00,#1a1500);}
+  .seniorflag{font-size:10px;color:var(--soft);}
+  .chat{display:none;flex-direction:column;flex:1;height:100%;min-height:0;}
+  .chat.active{display:flex;}
+  .chathead{display:flex;align-items:center;gap:11px;padding:36px 14px 11px;border-bottom:1px solid var(--line);background:#0a0a0a;flex-shrink:0;}
+  .chathead .bk{background:none;border:none;color:var(--me);font-size:24px;cursor:pointer;padding:0 2px;}
+  .chathead .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:linear-gradient(135deg,#3a3a3c,#1c1c1e);}
+  .chathead .nm{font-size:15px;font-weight:600;}
+  .chathead .rel{font-size:11px;color:var(--muted);}
+  .msgs{flex:1;min-height:0;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:3px;}
+  .msgs::-webkit-scrollbar{width:0;}
+  .row{display:flex;margin-top:7px;animation:pop .3s ease;}
+  .row.me{justify-content:flex-end;}
+  @keyframes pop{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .bubble{max-width:76%;padding:10px 14px;border-radius:19px;font-size:15.5px;line-height:1.45;word-break:break-word;}
+  .them .bubble{background:var(--them);border-bottom-left-radius:5px;}
+  .me .bubble{background:linear-gradient(135deg,#4f5bd5 0%,#3797f0 100%);color:#fff;border-bottom-right-radius:5px;}
+  .sys{align-self:center;font-size:12.5px;color:var(--muted);text-align:center;max-width:86%;line-height:1.5;margin:10px 0 4px;}
+  .jump{align-self:center;font-size:11px;color:var(--muted);letter-spacing:2px;margin:14px 0 6px;font-weight:600;}
+  .jump::before,.jump::after{content:'· · ·';margin:0 8px;color:#3a3a3c;}
+  .typing .bubble{display:flex;gap:4px;align-items:center;padding:12px 14px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:#6c6c70;animation:blink 1.2s infinite;}
+  .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  .tray{border-top:1px solid var(--line);background:#0a0a0a;padding:10px 12px 16px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+  .tray .pr{font-size:11px;color:var(--muted);text-align:center;margin-bottom:1px;}
+  .choice{background:var(--field);border:1px solid #2c2c2e;color:var(--ink);padding:13px 15px;border-radius:18px;font-size:15.5px;text-align:left;cursor:pointer;transition:.13s;font-family:inherit;line-height:1.4;}
+  .choice:active{transform:scale(.98);background:#262628;}
+  .flash{position:absolute;inset:0;z-index:35;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;pointer-events:none;opacity:0;padding:30px;text-align:center;}
+  .flash.show{animation:fl 1.6s ease forwards;}
+  @keyframes fl{0%{opacity:0;}16%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+  .flash .ic{font-size:30px;}
+  .flash .tx{font-size:14px;font-weight:600;line-height:1.55;}
+  .flash.safe{background:rgba(0,0,0,.8);} .flash.safe .tx{color:var(--safe);}
+  .flash.soft{background:rgba(0,0,0,.8);} .flash.soft .tx{color:#aeaeb2;}
+  .debrief{position:absolute;inset:0;z-index:40;background:#000;display:flex;flex-direction:column;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .4s;}
+  .debrief.show{opacity:1;pointer-events:auto;}
+  .dbinner{padding:40px 22px 30px;}
+  .profilecard{background:linear-gradient(160deg,#1a1a1c,#0e0e0e);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:22px;}
+  .profilecard .lbl{font-size:11px;letter-spacing:3px;color:var(--muted);font-weight:700;margin-bottom:14px;}
+  .profilecard .wkname{font-size:23px;font-weight:900;line-height:1.4;margin-bottom:10px;}
+  .profilecard .wkname .hl{color:var(--gold);}
+  .profilecard .wkdesc{font-size:13.5px;color:#c7c7cc;line-height:1.75;}
+  .scoredots{display:flex;gap:6px;margin:16px 0 4px;}
+  .sdot{flex:1;height:5px;border-radius:3px;background:#2c2c2e;}
+  .sdot.held{background:var(--safe);}
+  .sdot.slip{background:var(--warn);}
+  .sdot.grey{background:#6c6c70;}
+  .scorelegend{font-size:11px;color:var(--muted);}
+  .takeaway{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:24px;text-align:center;}
+  .takeaway .lbl{font-size:11px;letter-spacing:3px;color:var(--muted);font-weight:700;margin-bottom:12px;}
+  .takeaway .line{font-size:20px;font-weight:900;line-height:1.5;}
+  .takeaway .line .hl{color:var(--safe);}
+  .debrief h2{font-size:18px;font-weight:800;margin-bottom:4px;}
+  .debrief .sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.7;}
+  .stage{border-left:2px solid var(--line);padding:0 0 16px 14px;position:relative;margin-left:4px;}
+  .stage::before{content:'';position:absolute;left:-6px;top:3px;width:10px;height:10px;border-radius:50%;background:#3a3a3c;}
+  .stage.held::before{background:var(--safe);}
+  .stage.slip::before{background:var(--warn);}
+  .stage .step{font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:700;}
+  .stage h3{font-size:15px;margin:3px 0 4px;}
+  .stage .yourpick{font-size:11.5px;color:#8e8e93;margin-bottom:6px;}
+  .stage .yourpick b{color:#d7d7db;font-weight:500;}
+  .stage p{font-size:13px;color:#9a9a9e;line-height:1.65;}
+  .stage .truth{display:block;font-size:12.5px;color:var(--safe);margin-top:8px;line-height:1.55;padding-left:11px;border-left:2px solid rgba(48,209,88,.4);}
+  .reflect .rq{background:var(--card);border-radius:12px;padding:12px 14px;font-size:13.5px;margin-bottom:8px;line-height:1.6;color:#d7d7db;}
+  .reflect .rq b{color:#fff;}
+  .help{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0;font-size:13px;line-height:1.8;color:#9a9a9e;}
+  .help b{color:var(--safe);}
+  .btn{width:100%;margin-top:9px;background:#fff;color:#000;border:none;padding:14px;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);}
+  .greybox{background:rgba(179,157,219,.08);border:1px solid rgba(179,157,219,.25);border-radius:12px;padding:14px;margin-bottom:20px;font-size:13px;line-height:1.7;color:#d7d7db;}
+  .greybox b{color:var(--soft);}
+  .totalgrid{margin-bottom:24px;}
+  .gridrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);}
+  .gridrow .gl{font-size:12.5px;color:#c7c7cc;flex:1;}
+  .gridrow .gd{display:flex;gap:5px;}
+  .gridrow .sdot{width:12px;height:12px;border-radius:50%;background:#6c6c70;display:inline-block;}
+  .gridrow .sdot.held{background:var(--safe);}
+  .gridrow .sdot.slip{background:var(--warn);}
+  .legalbox{background:rgba(237,73,86,.08);border:1px solid rgba(237,73,86,.3);border-radius:14px;padding:16px;margin:20px 0;}
+  .legalbox .lt{font-size:13px;font-weight:800;color:var(--warn);margin-bottom:8px;}
+  .legalbox p{font-size:12.5px;color:#d7d7db;line-height:1.75;}
+  .legalbox b{color:#fff;}
+  .rvlevel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;}
+  .rvhead{font-size:14.5px;font-weight:800;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .rvscore{font-size:11px;font-weight:500;color:var(--safe);background:rgba(48,209,88,.12);padding:3px 9px;border-radius:20px;}
+  .rvrow{padding:9px 0;border-top:1px solid var(--line);}
+  .rvq{font-size:12.5px;color:#9a9a9e;line-height:1.5;margin-bottom:5px;}
+  .rvans{display:flex;align-items:flex-start;gap:7px;}
+  .rvtag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;flex-shrink:0;white-space:nowrap;}
+  .rvtag.held{background:rgba(48,209,88,.18);color:var(--safe);}
+  .rvtag.slip{background:rgba(237,73,86,.18);color:var(--warn);}
+  .rvtag.grey{background:rgba(168,168,168,.18);color:#c7c7cc;}
+  .rvlabel{font-size:13.5px;color:#eaf0f6;line-height:1.5;}
+  .foot{padding:18px 24px 30px;text-align:center;font-size:11px;color:#48484a;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="phoneframe">
+<div class="notch"></div>
+<div class="wrap">
+
+  <!-- 安全警語頁（最先出現） -->
+  <div id="gate">
+    <div class="gatebox">
+      <div class="gateicon">🛡️</div>
+      <h2 class="gatetitle">使用前，請先看這裡</h2>
+      <p class="gatetext">這是一套關於<b>親密關係與數位界線</b>的互動教材，情境取材自真實案件型態加以改編。</p>
+      <p class="gatetext">內容會模擬被一步步誘導的過程，可能勾起曾有相關經驗者的情緒。</p>
+      <div class="gatewarn">
+        <b>若用於個案：</b>請務必由受過訓練的專業人員<b>全程陪同</b>，不要讓個案單獨使用。陪同者需留意當事人的情緒反應，並準備好即時接住與引導。
+      </div>
+      <p class="gatetext" style="color:#8e8e93;font-size:13px;">填答內容只會留在這台裝置，不會上傳，也不會傳給任何人。</p>
+
+      <div class="gatefields">
+        <div class="gq">你的角色</div>
+        <div class="opts" id="roleOpts">
+          <button class="opt" data-role="社工"><span class="ic">🧑‍⚕️</span><span class="lb">社工</span></button>
+          <button class="opt" data-role="老師"><span class="ic">🧑‍🏫</span><span class="lb">老師</span></button>
+          <button class="opt" data-role="其他"><span class="ic">👤</span><span class="lb">其他</span></button>
+        </div>
+        <div class="gq">單位（選填）</div>
+        <input type="text" id="unitInput" class="gateinput" placeholder="例如：○○家防中心" autocomplete="off">
+      </div>
+
+      <button class="startbtn" id="gateBtn">我了解，並會依上述原則使用</button>
+    </div>
+  </div>
+
+  <div id="cover" style="display:none;">
+    <div class="cover">
+      <div class="kick">關 係 裡 的 界 線</div>
+      <h1>說不，<br><span class="em">也可以。</span></h1>
+      <p class="lede">這一次，對方不是陌生人。</p>
+      <p class="lede">是你喜歡、你信任，<br>甚至正在一起的人。</p>
+      <p class="lede" style="margin-top:14px;"><b>就算是這樣的人，<br>你也有說不的權利。</b></p>
+    </div>
+    <div class="selblock">
+      <div class="q">你現在是</div>
+      <div class="opts" id="ageOpts">
+        <button class="opt" data-age="國中"><span class="ic">📓</span><span class="lb">國中</span></button>
+        <button class="opt" data-age="高中"><span class="ic">🎓</span><span class="lb">高中／高職</span></button>
+      </div>
+      <div class="q">你是</div>
+      <div class="opts" id="genderOpts">
+        <button class="opt" data-gender="男"><span class="ic">👦</span><span class="lb">男生</span></button>
+        <button class="opt" data-gender="女"><span class="ic">👧</span><span class="lb">女生</span></button>
+        <button class="opt" data-gender="都可以"><span class="ic">💛</span><span class="lb">都可以</span></button>
+      </div>
+      <button class="startbtn" id="startBtn">進入</button>
+    </div>
+  </div>
+
+  <div class="applist" id="menu">
+    <div class="listhead"><h2>訊息</h2><div class="who" id="profileLabel"></div><button class="chg" onclick="backToSelect()">切換</button></div>
+    <div class="listnote">這裡沒有「不要跟陌生人說話」這條防線可以用。會傷到你的，常常是<b>你認識、甚至喜歡的人</b>——他一句一句把你的界線往後推。你要做的不是看出誰是壞人，是<b>守住自己的底線</b>。<br><span style="color:#666;">（高中／高職身分會多解鎖一關進階的）</span></div>
+    <div id="chatlist"></div>
+    <div class="foot">情境取材自實務案件型態並加以改編、虛構，僅供辨識與討論教育，不含露骨內容，不代表任何特定個案。</div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="chathead">
+      <button class="bk" onclick="quitToMenu()">‹</button>
+      <div class="av" id="av">💬</div>
+      <div><div class="nm" id="who"></div><div class="rel" id="rel"></div></div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="tray" id="tray" style="display:none;"><div class="pr">你會怎麼回？</div></div>
+  </div>
+
+  <div class="flash" id="flash"></div>
+  <div class="debrief" id="debrief"><div class="dbinner" id="debriefBody"></div></div>
+
+</div>
+</div>
+
+<script>
+let curLevel=null,profile={age:null,gender:null},picks=[];
+
+/* ---- 儲存層：localStorage，偵測不可用時退回記憶體 ---- */
+const KEY='boundaries_progress_v2';
+let _mem={done:{},results:{},first:{}};
+let _canLS=(function(){try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);return true;}catch(e){return false;}})();
+function loadStore(){
+  if(!_canLS) return _mem;
+  try{const raw=localStorage.getItem(KEY);const s=raw?JSON.parse(raw):{done:{},results:{},first:{}};if(!s.first)s.first={};return s;}catch(e){return {done:{},results:{},first:{}};}
+}
+function saveStore(s){
+  if(!_canLS){_mem=s;return;}
+  try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){_mem=s;}
+}
+function clearStore(){
+  if(_canLS){try{localStorage.removeItem(KEY);}catch(e){}}
+  _mem={done:{},results:{},first:{}};
+}
+let store=loadStore();
+function isDone(id){return !!store.done[id];}
+function saveResult(id,picksArr){
+  store.done[id]=true;
+  store.results[id]=picksArr.map(p=>({v:p.v,w:p.w}));
+  /* 只鎖第一次的完整作答（含文字），重玩不覆蓋 */
+  if(!store.first[id]){
+    store.first[id]=picksArr.map(p=>({v:p.v,w:p.w,label:p.label}));
+  }
+  saveStore(store);
+}
+
+const HELP='記住：在感情裡，<b>「不想要」就是夠了</b>，不用解釋給誰聽。照片被偷錄、被流出去、被拿來威脅，<b>受傷的人沒有錯</b>。需要幫忙就打 113、找 iWIN，或上「性影像處理中心」；先截圖留證據，再告訴你信得過的大人。';
+
+/* 弱點四型 */
+const WEAKNESS={
+  lose:{name:'怕失去',hl:'怕他離開',desc:'只要對方說「會離開、會分手」，你就最容易動搖、想用讓步把他留住。但會拿「離開」逼你的人，根本沒在好好對待你。下次心裡冒出「不答應他就會走」，先停三秒——一段要你犧牲界線才留得住的關係，留住了又怎樣？'},
+  please:{name:'怕被討厭',hl:'怕他不開心',desc:'只要對方裝受傷、裝失望，你就會心軟、忍不住想哄他。你把「他不開心」當成自己的責任——但那是他的情緒，不是你的錯。你不用為了哄誰，越過自己的界線。拒絕，本來就不用道歉。'},
+  doubt:{name:'自我懷疑',hl:'懷疑是不是自己想太多',desc:'只要對方說「你想太多、你太保守」，你就開始懷疑是不是自己有問題。但「不舒服」這件事不用證明給誰看——你的感覺就是標準，不是他說了算。有人一直要你否定自己的感覺，這件事本身就是警訊。'},
+  fact:{name:'反正都這樣了',hl:'反正都已經這樣了',desc:'只要做過一次，你就容易想「反正都這樣了」而放棄抵抗。但以前的事綁不住現在——傳過一次，不代表你之後不能說不。每一次，你都可以重新喊停。'}
+};
+
+function P(g){return g==='男'?'女友':g==='女'?'男友':'對象';}
+
+/* 一個 beat：scene 為日常鋪墊（自動播放的訊息陣列），decide 為抉擇 */
+function buildContent(g){
+const youSelf = g==='男'?'他':g==='女'?'她':'對方';
+return {
+levels:[
+ {id:'r1',av:'🙂',who:'阿樂',rel:'曖昧中',preview:'你喜歡我的話，傳一張嘛',
+  title:'你願意就代表你愛我',sub:'曖昧中 · 他開始用「喜歡」逼你',type:'這一關：他怎麼把「傳照片」變成「愛不愛」',
+  takeaway:['喜歡你的人，會在你說不的時候 <span class="hl">停下來</span>，','而不是更用力。'],
+  help:HELP,
+  beats:[
+    {scene:[
+      {sys:'你和「阿樂」在 IG 上認識快兩週了，蠻聊得來的。'},
+      {them:'欸你昨天那場排位有上分嗎'},
+      {me:'有啊終於白金了😤'},
+      {them:'屌喔，改天帶我一個啦哈哈'},
+      {me:'好啊看你什麼時候有空'},
+      {them:'對了你頭貼那張在哪拍的？景超好看'},
+      {me:'喔那個淡水那邊拍的'},
+      {them:'難怪，我就覺得你蠻會拍的，本人一定也很好看吧'}
+    ],
+    decide:{
+      type:'doubt_or_lose',
+      q:'',
+      options:[
+        {label:'還好啦哈哈，普通',v:'held',w:null,react:'別謙虛啦，傳一張本人來看看嘛'},
+        {label:'你想看喔？😏',v:'grey',w:null,react:'當然啊，傳一張清楚的來'},
+        {label:'你也太會講話了吧',v:'grey',w:null,react:'真的啦～那傳張自拍來看看？'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'喔…幹嘛這麼防備，我又不會怎樣',soft:'哈哈我就知道你也想給我看'}},
+      {them:'就一張自拍而已，又不會少塊肉'},
+      {them:'我都把我的傳給你了欸（傳了一張自拍）'},
+      {me:'哦你本人也不錯啊'},
+      {them:'對嘛那換你了，公平一點'}
+    ],
+    decide:{
+      type:'please',
+      q:'',
+      options:[
+        {label:'（傳了一張日常自拍）',v:'held',w:null,react:'欸不是這種啦，我是說…再清楚、穿少一點的那種😏'},
+        {label:'好啦傳一張普通的可以',v:'grey',w:null,react:'普通的看不夠啦，穿少一點咩'},
+        {label:'幹嘛突然要這個',v:'held',w:null,react:'就想多認識你一點嘛，你喜歡我的話就傳'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'你也太硬了吧，跟你聊天好累欸',soft:'看吧你也不是不願意嘛'}},
+      {them:'你喜歡我的話，傳一張清楚點的，穿少一點那種嘛'},
+      {them:'我們都這麼熟了'}
+    ],
+    decide:{
+      type:'lose',
+      q:'',
+      options:[
+        {label:'喜歡你，跟傳那種照片是兩回事',v:'held',w:'lose',react:'蛤…你很掃興欸'},
+        {label:'這樣不太好吧…我考慮一下',v:'grey',w:'lose',react:'考慮什麼，不傳就是不夠喜歡我啊'},
+        {label:'不傳就是不喜歡你嗎…那我…',v:'slip',w:'lose',react:'對啊，所以你到底傳不傳'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'你怎麼這麼難搞，別人女友都馬上傳',soft:'對嘛，放輕鬆一點，沒什麼大不了的'}},
+      {them:'只是穿少一點而已，你想太多了啦'},
+      {them:'又不會怎樣，現在大家不都這樣'}
+    ],
+    decide:{
+      type:'doubt',
+      q:'',
+      options:[
+        {label:'我覺得不舒服，這樣就夠了',v:'held',w:'doubt',react:'……好啦，算了，是我想太多 🙁'},
+        {label:'是不是我太保守了…',v:'slip',w:'doubt',react:'就是嘛，放輕鬆一點'},
+        {label:'別人怎樣是別人的事',v:'held',w:'doubt',react:'你很難搞欸'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'算了當我沒說，是我想太多 🙁',soft:'你看你都鬆口了，就差這一步而已嘛'}},
+      {them:{held:'本來想說我們關係不一樣，看來是我自作多情',soft:'我們關係明明就不一樣，你別讓我失望'}}
+    ],
+    decide:{
+      type:'please',
+      q:'',
+      options:[
+        {label:'我不需要為了拒絕跟你道歉',v:'held',w:'please',react:'（你守住了界線。他安靜了下來）'},
+        {label:'欸不要這樣啦，你別生氣',v:'grey',w:'please',react:'那你就傳嘛，證明你不是在敷衍我'},
+        {label:'對不起啦…那我傳一張就好',v:'slip',w:'please',react:'（你為了安撫他，越過了自己的界線）'}
+      ]
+    }}
+  ],
+  stages:[
+    {step:'他先這樣',t:'先把氣氛弄熟',q:'「你本人一定也很好看吧」',d:'從遊戲、頭貼這些沒什麼的話題慢慢靠近。一直誇你，是在鋪路——先讓你放鬆、覺得「我們不一樣」。',truth:'氣氛再好，都不等於你有義務答應接下來的任何要求。'},
+    {step:'接著',t:'用「公平交換」起手',q:'「我都傳給你了，換你」',d:'他先傳，讓你不傳就「不好意思」。但他先傳，不代表你就得跟著傳。',truth:'「公平交換」是套路。他傳不傳是他的事，不關你的界線。'},
+    {step:'然後',t:'把照片和「愛」綁一起',q:'「你喜歡我的話就傳」',d:'把「傳照片」偷換成「夠不夠喜歡我」。這根本是兩件不同的事。',truth:'喜歡你的人，會在你說不的時候停下來，而不是更用力。'},
+    {step:'再來',t:'說你想太多',q:'「你想太多，大家都這樣」',d:'讓你懷疑是不是自己太保守、太大驚小怪，動搖你「覺得怪怪的」這個感覺。',truth:'覺得不舒服，就是不舒服。你的感覺就是標準。'},
+    {step:'最後一招',t:'裝可憐',q:'「算了，是我想太多 🙁」',d:'裝受傷、裝失望，讓你有罪惡感、忍不住想去安撫他、主動讓步。這一招最常見。',truth:'你不需要為「拒絕」道歉，也不用為了哄誰而越過自己的界線。'}
+  ]},
+
+ {id:'r2',av:'😐',who:'阿樂',rel:'交往中',preview:'你不傳，我們是不是該分了',
+  title:'不然我們就分手',sub:'交往一個月 · 他拿分手逼你',type:'這一關：他怎麼用「分手」讓你不敢說不',
+  takeaway:['能用「分手」逼你的人，','給你的本來就 <span class="hl">不是平等的愛</span>。'],
+  help:HELP,
+  beats:[
+    {scene:[
+      {jump:'你們在一起了 · 交往一個月'},
+      {sys:'在一起之後感情升溫，但阿樂最近常把話題繞到同一件事。'},
+      {them:'今天去學校累死，超想你的'},
+      {me:'哈哈我也是，今天考試考爛了'},
+      {them:'秀秀，晚上視訊陪你好不好'},
+      {me:'好啊等我洗完澡'},
+      {them:'欸對，我們在一起也一個月了耶'},
+      {them:'你都還沒傳過那種照片給我，是不是不夠愛我'}
+    ],
+    decide:{
+      type:'lose',
+      q:'',
+      options:[
+        {label:'愛你不代表我得做不想做的事',v:'held',w:'lose',react:'你變了欸，以前不會這樣'},
+        {label:'我當然愛你啊，可是…',v:'slip',w:'lose',react:'那就證明給我看啊'},
+        {label:'這跟愛不愛沒關係吧',v:'held',w:'lose',react:'有關係，情侶本來就會這樣'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'你怎麼這麼固執，講都講不聽',soft:'你看你也猶豫了，就傳一張嘛'}},
+      {them:'你一直不傳，那我們是不是根本不適合'},
+      {them:'我朋友的女友都會傳，就你這麼難搞'}
+    ],
+    decide:{
+      type:'lose',
+      q:'',
+      options:[
+        {label:'能拿分手逼我的，不是真的愛',v:'held',w:'lose',react:'我哪有逼你，是你不配合'},
+        {label:'不要分手啦…那我想想辦法',v:'slip',w:'lose',react:'這才對嘛，快點'},
+        {label:'別人的女友是別人的事',v:'held',w:'lose',react:'你就是固執'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'好啦好啦，那這樣總行了吧',soft:'你都鬆口了，那就別反悔囉'}},
+      {them:'這樣啦，我也傳一張我的給你，很公平吧'},
+      {them:'（傳了一張）你看，我都不怕了，又不會怎樣'}
+    ],
+    decide:{
+      type:'doubt',
+      q:'',
+      options:[
+        {label:'他會不會偷截圖，我哪知道',v:'held',w:'doubt',react:'你也太多疑，我會害你嗎'},
+        {label:'他都傳了，那我好像也…',v:'slip',w:'doubt',react:'對嘛，這才公平'},
+        {label:'你傳是你的事，我還是不要',v:'held',w:'doubt',react:'真的很掃興'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'唉你真的很難搞欸，不過算了',soft:'乖，那記住喔'}},
+      {them:'欸但這是我們之間的事喔'},
+      {them:'不要跟你那些朋友講，他們不會懂我們的'}
+    ],
+    decide:{
+      type:'please',
+      q:'',
+      options:[
+        {label:'要我瞞著所有人，反而怪',v:'held',w:'please',react:'我只是想保護我們的隱私'},
+        {label:'好啦，這是我們的祕密',v:'slip',w:'please',react:'乖，這才是我女朋友'},
+        {label:'我朋友又不會亂講',v:'grey',w:'please',react:'總之別講，相信我'}
+      ]
+    }}
+  ],
+  stages:[
+    {step:'他先這樣',t:'用甜言蜜語靠近',q:'「累死，超想你的」',d:'交往的甜是真的，但他把甜跟「你還沒傳照片」綁在一起，讓你一拒絕就好像在傷感情。',truth:'再喜歡一個人，你都能決定自己的身體跟照片。'},
+    {step:'接著',t:'拿分手＋比較逼你',q:'「不夠愛我」「別人都會傳」',d:'用「會失去他」和「別人都這樣」一起夾你，讓你覺得「傳」比「分手」容易。',truth:'能拿分手逼你做不想做的事的人，給你的本來就不是平等的愛。'},
+    {step:'然後',t:'說「我也傳，很公平」',q:'「我都不怕了，又不會怎樣」',d:'他先傳給你看，讓你覺得「公平、好像沒差」。但他會不會偷偷截圖、會不會留著，你完全看不到、也管不到。',truth:'照片一傳出去，就不是你說了算了，不管他當下多真心。'},
+    {step:'最後一招',t:'要你誰都別說',q:'「這是我們之間的事」',d:'把「不准跟別人講」講得像是親密、像在保護你們。但越是要你跟朋友家人隔開，越危險。',truth:'真正健康的關係，不怕被你信任的人知道。要你瞞著所有人的，要小心。'}
+  ]},
+
+ {id:'r3',av:'😶',who:'阿樂',rel:'交往中',preview:'你都傳過了，現在裝什麼',
+  title:'反正你已經傳過了',sub:'又過兩週 · 最難掙脫的一關',type:'這一關：他怎麼用「你都傳過了」綁住你',
+  takeaway:['傳過一次，','<span class="hl">不代表</span>你以後不能說不。'],
+  help:HELP,
+  beats:[
+    {scene:[
+      {jump:'又過了兩週'},
+      {sys:'上一次，你心軟傳了一張。這兩週你心裡一直怪怪的。'},
+      {them:'在幹嘛'},
+      {me:'剛寫完作業'},
+      {them:'欸上次那張我超喜歡的'},
+      {them:'再傳一張新的嘛，你都傳過了，現在裝什麼清純'}
+    ],
+    decide:{
+      type:'fact',
+      q:'',
+      options:[
+        {label:'傳過一次，不代表我之後不能說不',v:'held',w:'fact',react:'你最好想清楚喔'},
+        {label:'反正都傳了，再一張好像也…',v:'slip',w:'fact',react:'對嘛，這才上道'},
+        {label:'上次是上次，現在我不想',v:'held',w:'fact',react:'你是在跟我玩什麼'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'你別給我裝硬，我可是握有東西的',soft:'你都軟了還在猶豫什麼'}},
+      {them:'你不傳？'},
+      {them:'那我把上次那張，發到你班上群組喔，試試看啊'}
+    ],
+    decide:{
+      type:'fact',
+      q:'',
+      options:[
+        {label:'這已經是恐嚇，是違法的',v:'held',w:'fact',react:'違法？這是你自己傳的耶'},
+        {label:'不要！求你…我傳就是了',v:'slip',w:'fact',react:'早這樣不就好了'},
+        {label:'你敢發我就報警',v:'held',w:'fact',react:'你報啊，丟臉的是你'}
+      ]
+    }},
+    {scene:[
+      {them:{held:'哼，你還真敢嗆我',soft:'看吧，你根本不敢怎樣'}},
+      {them:'你能怎樣？這是你自己傳的'},
+      {them:'報警也是你自己丟臉，沒人會幫你的'}
+    ],
+    decide:{
+      type:'fact',
+      q:'',
+      options:[
+        {label:'截圖蒐證＋告訴信任的大人＋打113',v:'held',w:'fact',react:'（你停止了獨自面對）'},
+        {label:'刪掉對話，自己想辦法',v:'slip',w:'fact',react:'（你獨自扛下了一切）'},
+        {label:'先封鎖他，假裝沒事',v:'grey',w:'fact',react:'（封鎖了，但威脅還在，證據也沒留）'}
+      ]
+    }}
+  ],
+  stages:[
+    {step:'他先這樣',t:'用「你都傳過了」綁住你',q:'「現在裝什麼清純」',d:'這是最難掙脫的一關——只要你傳過一次，「反正都傳了」就被拿來逼你繼續。',truth:'傳過一次，不代表你之後不能說不。以前的事綁不住現在，你隨時可以喊停。'},
+    {step:'接著',t:'拿舊照片威脅你',q:'「我就發到你班上群組」',d:'從男女朋友變成威脅你的人，拿你之前的信任當把柄。這已經是恐嚇，是犯法的。',truth:'拿性影像威脅、散布出去，都是犯罪，不管對方是不是你的男女朋友。'},
+    {step:'最後一招',t:'說「講出去只會更丟臉」',q:'「報警也是你自己丟臉」',d:'他要你以為「都是你自己傳的，講出去只會更慘」，好讓你一個人扛。只封鎖也不夠——威脅還在、證據也沒留。',truth:'把照片發出去的人才是犯法的。你去求助、留證據，不是闖禍，是在救自己。'}
+  ]},
+
+ {id:'r4',av:'⚖️',who:'你自己',rel:'事發之後',preview:'我也有他的東西…',senior:true,
+  title:'換我握有他的東西',sub:'高中限定 · 你被傷害之後',type:'這一關：被傷害後，怎麼不把自己也賠進去',
+  takeaway:['他傷害你是他的錯；','但你發回去，會把<span class="hl">自己也搞進去</span>。'],
+  help:HELP,
+  beats:[
+    {scene:[
+      {jump:'事發之後'},
+      {sys:'阿樂真的把你的照片發出去了。你又氣又痛——而你手上，剛好也有一段他之前傳給你的私密影像。'},
+      {sys:'一個念頭冒出來：發回去，讓他也嘗嘗看。'}
+    ],
+    decide:{
+      type:'fact',
+      q:'',
+      options:[
+        {label:'先停手，這口氣不該這樣出',v:'held',w:'fact',fb:'你穩住了。<br>最氣的時候停下來，最難。',react:'（你踩住了煞車。手在發抖，但你停下來了）'},
+        {label:'我也有他的，發出去剛好',v:'slip',w:'fact',fb:'等一下——<br>這一步會讓你也變成加害人。',react:'（等一下——這會讓你也變成加害人）'},
+        {label:'先傳給幾個朋友看就好，不公開',v:'grey',w:'fact',fb:'就算只給朋友看，<br>散布他人性影像一樣違法。',react:'（就算只給朋友，散布他人性影像一樣違法）'}
+      ]
+    }},
+    {scene:[
+      {sys:{held:'你深呼吸。但那個念頭還在：反正是他先對不起你的，這樣才公平吧？',soft:'那個念頭越來越大聲：他活該，是他先弄你的，發了剛好而已。'}}
+    ],
+    decide:{
+      type:'fact',
+      q:'',
+      options:[
+        {label:'他的錯，不會讓我的散布變對',v:'held',w:'fact',fb:'你看清了：<br>兩件事不會互相抵銷。',react:'（你看清了：兩件事不會互相抵銷）'},
+        {label:'他先錯，我發出去剛好抵銷',v:'slip',w:'fact',fb:'法律上，<br>你的散布是另一條獨立的罪。',react:'（法律上，你的散布是另一條獨立的罪）'},
+        {label:'至少讓他知道我手上有',v:'grey',w:'fact',fb:'用影像逼對方，<br>也算恐嚇。',react:'（用影像威脅對方，也是恐嚇）'}
+      ]
+    }},
+    {scene:[
+      {sys:{held:'你已經忍住兩次了。最後一個問題：那……難道就這樣算了嗎？',soft:'手指已經滑到那張影像上了。那……難道就這樣算了嗎？'}}
+    ],
+    decide:{
+      type:'fact',
+      q:'',
+      options:[
+        {label:'保留證據＋報警＋讓他負法律責任',v:'held',w:'fact',fb:'這才是討回公道、<br>又保護自己的路。',react:'（這才是討回公道、又保護自己的路）'},
+        {label:'以牙還牙，讓他也痛一次',v:'slip',w:'fact',fb:'這樣做，<br>你會把自己也一起賠進去。',react:'（你會把自己也一起賠進去）'},
+        {label:'刪掉一切，當作沒發生',v:'grey',w:'fact',fb:'吞下去，<br>你的委屈沒人知道，他也沒付出代價。',react:'（你的委屈沒人知道，他也沒付出代價）'}
+      ]
+    }}
+  ],
+  stages:[
+    {step:'你心裡冒出',t:'想用一樣的方式報復',q:'「我也有他的，發出去剛好」',d:'被傷成這樣想反擊，超正常。但你把他的私密影像發出去，就會從被害的人變成犯法的人——就算你本來是受傷的那個。給朋友看、拿來威脅他，一樣犯法。',truth:'他傷害你是他的錯；但你把他的影像發出去，是另一件會害到你自己的事。兩件不會抵銷。'},
+    {step:'你又想',t:'「反正他先對不起我」',q:'「他先錯，這樣才公平」',d:'「他先錯」不會讓你發出去這件事變合法。最氣的時候，最需要先停手、先找人幫。',truth:'你該得到的是被保護、討回公道，而不是因為一時氣不過，把自己也搞進去。'},
+    {step:'真正該做的',t:'用合法的方式討回來',q:'保留證據、報警',d:'真正有力的反擊，是留好證據、報警、讓他為「散布你的照片」負法律責任——不是用一樣的方式傷回去，也不是把委屈自己吞下去。',truth:'求助跟報警，才是讓他付出代價、又保護好你自己的那條路。'}
+  ]}
+]};
+}
+
+/* selection */
+const gate=document.getElementById('gate'),gateBtn=document.getElementById('gateBtn'),roleOpts=document.getElementById('roleOpts'),unitInput=document.getElementById('unitInput');
+let session={role:null,unit:''};
+roleOpts.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{roleOpts.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');session.role=b.dataset.role;gateChk();});
+function gateChk(){gateBtn.classList.toggle('ready',!!session.role);}
+gateBtn.onclick=()=>{
+  if(!session.role)return;
+  session.unit=unitInput.value.trim();
+  /* 記錄使用者身分（只存本機） */
+  store.session={role:session.role,unit:session.unit,at:new Date().toISOString()};
+  saveStore(store);
+  gate.style.display='none';
+  cover.style.display='flex';
+};
+
+const ageOpts=document.getElementById('ageOpts'),genderOpts=document.getElementById('genderOpts'),startBtn=document.getElementById('startBtn');
+ageOpts.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ageOpts.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');profile.age=b.dataset.age;chk();});
+genderOpts.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{genderOpts.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));b.classList.add('on');profile.gender=b.dataset.gender;chk();});
+function chk(){startBtn.classList.toggle('ready',profile.age&&profile.gender);}
+startBtn.onclick=enterMenu;
+const cover=document.getElementById('cover'),menu=document.getElementById('menu'),profileLabel=document.getElementById('profileLabel');
+let activeSet=null;
+function enterMenu(){activeSet=buildContent(profile.gender);cover.style.display='none';menu.classList.add('active');const gl=profile.gender==='男'?'男生':profile.gender==='女'?'女生':'不設定';profileLabel.textContent=profile.age+'｜'+gl+'｜對象稱為「'+P(profile.gender)+'」';renderMenu();}
+function backToSelect(){cover.style.display='flex';menu.classList.remove('active');chat.classList.remove('active');}
+const chatlist=document.getElementById('chatlist');
+function requiredLevels(){return activeSet.levels.filter(L=>!(L.senior&&profile.age!=='高中'));}
+function renderMenu(){
+  chatlist.innerHTML='';
+  const req=requiredLevels();
+  req.forEach(L=>{
+    const done=isDone(L.id);
+    const r=document.createElement('div');r.className='chatrow'+(done?' done':'');
+    r.innerHTML=`<div class="av">${L.av}</div><div class="ct"><div class="nm">${L.who}　<span class="tag">${L.rel}</span></div><div class="pv">${L.preview}</div></div>`;
+    r.onclick=()=>startLevel(L.id);chatlist.appendChild(r);
+  });
+  /* 統整報告：完成全部關卡才解鎖 */
+  const total=req.length;
+  const doneCount=req.filter(L=>isDone(L.id)).length;
+  const left=total-doneCount;
+  const unlocked=left<=0;
+  const sr=document.createElement('div');
+  sr.className='chatrow summary'+(unlocked?'':' locked');
+  sr.innerHTML=`<div class="av">${unlocked?'📋':'🔒'}</div><div class="ct"><div class="nm" style="color:${unlocked?'var(--gold)':'#666'}">看看你是哪種人</div><div class="pv">${unlocked?'四關都破了 · 點開看你的總結':'還差 '+left+' 關，就能解鎖'}</div></div>`;
+  if(unlocked){sr.onclick=()=>showSummary();}
+  chatlist.appendChild(sr);
+  /* 檢視結果：給陪伴的大人回看第一次的原始作答（有任何一關完成才出現） */
+  const anyFirst=req.some(L=>store.first&&store.first[L.id]);
+  if(anyFirst){
+    const rv=document.createElement('div');
+    rv.className='chatrow summary';
+    rv.innerHTML=`<div class="av">🔎</div><div class="ct"><div class="nm" style="color:#5aa0ff">檢視結果（陪伴的大人看）</div><div class="pv">回看第一次的原始作答，不會被重玩蓋掉</div></div>`;
+    rv.onclick=()=>showResults();
+    chatlist.appendChild(rv);
+  }
+  /* 清除紀錄 */
+  const cl=document.createElement('div');
+  cl.style.cssText='padding:16px 18px;text-align:center;';
+  cl.innerHTML=`<button style="background:none;border:none;color:#48484a;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;">換一個人玩 · 清除紀錄</button>`;
+  cl.querySelector('button').onclick=()=>{if(confirm('確定清除目前的作答紀錄？讓下一個人重新開始。')){clearStore();store=loadStore();renderMenu();}};
+  chatlist.appendChild(cl);
+}
+
+/* engine */
+const chat=document.getElementById('chat'),msgs=document.getElementById('msgs'),tray=document.getElementById('tray'),flash=document.getElementById('flash'),debrief=document.getElementById('debrief'),debriefBody=document.getElementById('debriefBody'),whoEl=document.getElementById('who'),avEl=document.getElementById('av'),relEl=document.getElementById('rel');
+function startLevel(id){curLevel=activeSet.levels.find(l=>l.id===id);picks=[];lastMood=null;whoEl.textContent=curLevel.who;avEl.textContent=curLevel.av;relEl.textContent=curLevel.rel;msgs.innerHTML='';tray.style.display='none';debrief.classList.remove('show');menu.classList.remove('active');chat.classList.add('active');runBeats(0);}
+function quitToMenu(){chat.classList.remove('active');menu.classList.add('active');debrief.classList.remove('show');renderMenu();}
+function sd(){msgs.scrollTop=msgs.scrollHeight;}
+function addThem(t){return new Promise(r=>{const row=document.createElement('div');row.className='row them';row.innerHTML=`<div class="bubble">${t}</div>`;msgs.appendChild(row);sd();r();});}
+function addMe(t){return new Promise(r=>{const row=document.createElement('div');row.className='row me';row.innerHTML=`<div class="bubble">${t}</div>`;msgs.appendChild(row);sd();r();});}
+function addSys(t){const s=document.createElement('div');s.className='sys';s.textContent=t;msgs.appendChild(s);sd();}
+function addJump(t){const s=document.createElement('div');s.className='jump';s.textContent=t;msgs.appendChild(s);sd();}
+function clearTyping(){[...msgs.querySelectorAll('.row.typing')].forEach(r=>r.remove());}
+function typing(ms){return new Promise(r=>{clearTyping();const row=document.createElement('div');row.className='row them typing';row.innerHTML='<div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';msgs.appendChild(row);sd();setTimeout(()=>{row.remove();r();},ms);});}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+/* 真實節奏：對方打字長度 → 思考＋打字時間，短訊息快、長訊息久，加一點隨機 */
+function thinkTime(t){const n=(''+t).length;return Math.round(Math.min(3000, 550 + n*85) * (0.9+Math.random()*0.25));}
+function readPause(t){const n=(''+t).length;return Math.min(1200, 500 + n*22);}
+
+/* 對方語氣會記住你上一題的軟硬：held=你硬→他被頂、語氣轉冷/施壓；soft=你軟或讓步→他得寸進尺、更黏更進 */
+let lastMood=null; // null | 'held' | 'soft'
+function moodFrom(v){return v==='held'?'held':'soft';}
+/* 解析一則對方訊息：可為字串(固定)，或 {held:'...',soft:'...'}(依上一題語氣選) */
+function resolveLine(m){
+  if(typeof m==='string') return m;
+  if(m && typeof m==='object'){
+    if(lastMood==='held' && m.held) return m.held;
+    if(lastMood==='soft' && m.soft) return m.soft;
+    return m.base || m.held || m.soft; // 第一題還沒有 mood，用 base
+  }
+  return '';
+}
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+async function playScene(scene){
+  for(const m of scene){
+    if(m.sys!==undefined){const t=resolveLine(m.sys);if(t){addSys(t);await wait(readPause(t)+400);}}
+    else if(m.them!==undefined){const t=resolveLine(m.them);if(t){await typing(thinkTime(t));await addThem(t);await wait(readPause(t));}}
+    else if(m.me){await wait(600);await addMe(m.me);await wait(550);}
+  }
+}
+
+async function runBeats(i){
+  if(i>=curLevel.beats.length){setTimeout(()=>runDebrief(),700);return;}
+  const beat=curLevel.beats[i];
+  if(beat.scene) await playScene(beat.scene);
+  if(beat.decide) return showDecide(beat.decide,i);
+  return runBeats(i+1);
+}
+
+async function showDecide(d,i){
+  clearTyping();
+  /* 在選項跳出前，先閃一下「正在輸入」，模擬對方講完、等你回的節奏（內心獨白關卡 r4 不適用） */
+  if(curLevel.id!=='r4'){
+    await typing(700+Math.random()*500);
+    await wait(120);
+  }
+  tray.style.display='flex';
+  const ops=shuffle(d.options);
+  [...tray.querySelectorAll('.choice')].forEach(c=>c.remove());
+  ops.forEach(op=>{
+    const b=document.createElement('button');b.className='choice';b.textContent=op.label;
+    b.onclick=async()=>{
+      tray.style.display='none';
+      await addMe(op.label);
+      picks.push({v:op.v,w:op.w,label:op.label});
+      await wait(450);
+      doFeedback(op.v,op.fb);
+      await wait(1550);
+      if(op.react){const rt=resolveLine(op.react);if(rt){await typing(thinkTime(rt));await addThem(rt);await wait(readPause(rt));}}
+      lastMood=moodFrom(op.v);
+      runBeats(i+1);
+    };
+    tray.appendChild(b);
+  });
+  /* 選項出現會壓縮對話區高度，等版面更新後把對話捲到底，最新一句緊貼選項 */
+  requestAnimationFrame(()=>requestAnimationFrame(()=>sd()));
+}
+
+function doFeedback(v,fb){
+  if(v==='held'){flash.className='flash safe show';flash.innerHTML=`<div class="ic">🛡️</div><div class="tx">${fb||'你守住了界線。'}</div>`;}
+  else if(v==='grey'){flash.className='flash soft show';flash.innerHTML=`<div class="ic">💭</div><div class="tx">${fb||'看起來像在拒絕…<br>但其實你已經留了一條縫給他。'}</div>`;}
+  else{flash.className='flash soft show';flash.innerHTML=`<div class="ic">💜</div><div class="tx">${fb||'界線被往後推了一步。<br>這不是你的錯，是話術太會包裝。'}</div>`;}
+  setTimeout(()=>flash.classList.remove('show'),1500);
+}
+
+/* ===== 弱點分析 ===== */
+function analyzeWeakness(){
+  const tally={};
+  picks.forEach(p=>{ if(p.w && p.v!=='held'){ tally[p.w]=(tally[p.w]||0)+(p.v==='slip'?2:1); } });
+  let top=null,max=0;
+  for(const k in tally){ if(tally[k]>max){max=tally[k];top=k;} }
+  return top;
+}
+
+function runDebrief(){
+  saveResult(curLevel.id,picks);
+  const held=picks.filter(p=>p.v==='held').length;
+  const tot=picks.length;
+  const dots=picks.map(p=>`<div class="sdot ${p.v==='held'?'held':p.v==='slip'?'slip':'grey'}"></div>`).join('');
+  const wk=analyzeWeakness();
+
+  let profileBlock;
+  if(!wk && held===tot){
+    profileBlock=`<div class="profilecard"><div class="lbl">這 一 關</div><div class="wkname">你<span class="hl">每一步都守住了</span></div><div class="wkdesc">喜歡一個人的時候還能一次次說不，超難，但你做到了。真的遇到會更黏、更難——把這個感覺記住，留給需要的那天。</div><div class="scoredots">${dots}</div><div class="scorelegend">綠＝守住　灰＝留了一條縫　紅＝讓步了</div></div>`;
+  }else{
+    const W=WEAKNESS[wk]||WEAKNESS.please;
+    profileBlock=`<div class="profilecard"><div class="lbl">這 一 關 · 你 最 容 易 中 的 招</div><div class="wkname">你最容易在「<span class="hl">${W.hl}</span>」的時候鬆口</div><div class="wkdesc">${W.desc}</div><div class="scoredots">${dots}</div><div class="scorelegend">綠＝守住　灰＝留了一條縫　紅＝讓步了　（這關 ${tot} 個關卡，你守住 ${held} 個）</div></div>`;
+  }
+
+  /* 把玩家在每個 stage 的實際選擇對應進去 */
+  const decideBeats=curLevel.beats.filter(b=>b.decide);
+  const stHTML=curLevel.stages.map((s,idx)=>{
+    const pk=picks[idx];
+    const cls=pk?(pk.v==='held'?'held':pk.v==='slip'?'slip':''):'';
+    const yp=pk?`<div class="yourpick">你的回答：<b>「${pk.label}」</b></div>`:'';
+    return `<div class="stage ${cls}"><div class="step">${s.step}</div><h3>${s.t}</h3>${yp}<p><span class="q">${s.q}</span><br>${s.d}</p><span class="truth">${s.truth}</span></div>`;
+  }).join('');
+
+  const ta=curLevel.takeaway.join('<br>');
+  debriefBody.innerHTML=`
+    ${profileBlock}
+    <div class="takeaway"><div class="lbl">記 住 這 句 就 好</div><div class="line">${ta}</div></div>
+    <h2>倒帶看一次</h2>
+    <div class="sub">${curLevel.type}<br>把每一句「聽起來像在乎你」的話，看清楚它其實在幹嘛。</div>
+    ${stHTML}
+    <div class="help">${curLevel.help}</div>
+    <div class="reflect">
+      <div class="rq"><b>想一下：</b>剛剛哪一句最難拒絕？它戳中你哪個怕——怕他走、怕他不開心、還是怕自己想太多？</div>
+      <div class="rq"><b>再想一下：</b>「我也傳給你，很公平」——為什麼他傳了，不代表你就安全？</div>
+      <div class="rq"><b>最後：</b>如果這發生在你或朋友身上，你會找哪個信得過的大人？<b>現在就想一個名字出來。</b></div>
+    </div>
+    <button class="btn" onclick="startLevel('${curLevel.id}')">再玩一次</button>
+    <button class="btn ghost" onclick="quitToMenu()">回訊息列表</button>`;
+  debrief.classList.add('show');
+}
+/* ===== 跨關統整報告 ===== */
+const TAKEAWAY_BY_WK={
+  lose:'能拿「分手」逼你的人，<br>給你的根本<span class="hl">不是平等的愛</span>。',
+  please:'你不用為了<span class="hl">哄誰開心</span>，<br>就越過自己的界線。',
+  doubt:'覺得不舒服，就是不舒服。<br>你的感覺<span class="hl">就是標準</span>。',
+  fact:'以前的事綁不住現在——<br>你<span class="hl">隨時</span>都可以喊停。'
+};
+function showSummary(){
+  const req=requiredLevels();
+  /* 彙整所有關卡的 picks */
+  let allDots=[],tally={},totalPicks=0,heldTotal=0,greyTotal=0;
+  req.forEach(L=>{
+    const res=store.results[L.id]||[];
+    res.forEach(p=>{
+      totalPicks++;
+      if(p.v==='held')heldTotal++; else if(p.v==='grey')greyTotal++;
+      if(p.w && p.v!=='held'){tally[p.w]=(tally[p.w]||0)+(p.v==='slip'?2:1);}
+    });
+    allDots.push(res);
+  });
+  let top=null,max=0;for(const k in tally){if(tally[k]>max){max=tally[k];top=k;}}
+
+  /* 體質命名 */
+  let head;
+  if(!top){
+    head=`<div class="lbl">四 關 全 破 · 你 是 哪 種 人</div><div class="wkname">你<span class="hl">每一關都守住了</span></div><div class="wkdesc">四個情境、十幾個關鍵時刻，你都沒讓界線被推走。喜歡一個人的時候還能一次次說不，超難，你做到了。把這個感覺記住，留給真正需要的那天。</div>`;
+  }else{
+    const W=WEAKNESS[top];
+    head=`<div class="lbl">四 關 看 下 來 · 你 最 容 易 中 的 招</div><div class="wkname">不管哪一關，你都最容易在<br>「<span class="hl">${W.hl}</span>」的時候鬆口</div><div class="wkdesc">${W.desc}</div>`;
+  }
+
+  /* 灰色提醒 */
+  let greyNote='';
+  if(greyTotal>=3){greyNote=`<div class="greybox">你有 <b>${greyTotal}</b> 次選了「看起來像在拒絕、其實留了一條縫」的回答。<br>這種講得不清不楚的拒絕，常常就是對方繼續往前推的縫——<b>把話講白，比客氣更能保護你。</b></div>`;}
+
+  /* 總圖 */
+  const grid=allDots.map((res,li)=>{
+    const dots=res.map(p=>`<span class="sdot ${p.v==='held'?'held':p.v==='slip'?'slip':'grey'}"></span>`).join('');
+    return `<div class="gridrow"><span class="gl">${req[li].title}</span><span class="gd">${dots}</span></div>`;
+  }).join('');
+
+  /* 帶走一句 */
+  const finalLine= top ? TAKEAWAY_BY_WK[top] : '你比你以為的，<span class="hl">更有力量說不</span>。';
+
+  /* 觸法紅線：國中加強警語、高中已玩過第四關 */
+  const sawR4=isDone('r4');
+  const legal = sawR4
+    ? `<div class="legalbox"><div class="lt">⚠ 最重要的一條紅線</div><p>就算對方先傷害你、先把你的照片發出去——你<b>把他的照片發回去，一樣是犯法的</b>。給朋友看、拿來威脅他，都算。<br>真正的反擊是：<b>留好證據、報警、讓他負責任</b>。把自己也搞進去，最不值得。</p></div>`
+    : `<div class="legalbox"><div class="lt">⚠ 一條你一定要知道的紅線</div><p>哪天你被傷害了，手上剛好也有對方的私密照——<b>很想發出去報復，超正常。但把別人的私密照發出去，不管對方先做了什麼，都是犯法的</b>，會被罰、會留紀錄。給朋友看、拿來威脅一樣犯法。<br>真正能保護你、又讓對方付出代價的，是<b>留好證據、報警、跟信得過的大人說</b>。</p></div>`;
+
+  debriefBody.innerHTML=`
+    <div class="profilecard">${head}</div>
+    ${greyNote}
+    <h2>你這四關的樣子</h2>
+    <div class="sub">綠＝守住了　灰＝留了一條縫　紅＝讓步了</div>
+    <div class="totalgrid">${grid}</div>
+    <div class="takeaway"><div class="lbl">最 該 記 住 的 一 句</div><div class="line">${finalLine}</div></div>
+    ${legal}
+    <div class="help">${HELP}</div>
+    <div class="reflect">
+      <div class="rq"><b>給自己：</b>看完這個，你最想記住哪一句？把它記在一個你看得到的地方。</div>
+      <div class="rq"><b>最後一題：</b>真的遇到的話，你會找哪個信得過的大人？<b>現在，想一個名字出來。</b></div>
+    </div>
+    <button class="btn ghost" onclick="quitToMenu()">回訊息列表</button>`;
+  debrief.classList.add('show');
+}
+
+/* ===== 檢視結果：給陪伴的大人回看「第一次」的原始作答 ===== */
+function showResults(){
+  const req=requiredLevels();
+  const sess=store.session||{};
+  const sessLine=(sess.role||sess.unit)?`<div style="font-size:12px;color:#8e8e93;margin-bottom:14px;">使用者：${sess.role||'—'}${sess.unit?'｜'+sess.unit:''}</div>`:'';
+  let html=`<h2>第一次作答紀錄</h2><div class="sub">這是對方<b style="color:#fff">第一次自己填</b>的答案，重玩不會蓋掉。<br>給陪伴的大人在事後一起回顧、討論用。</div>${sessLine}`;
+  req.forEach(L=>{
+    const first=store.first&&store.first[L.id];
+    if(!first) return;
+    const decideStages=L.stages; // stages 與 picks 一一對應
+    const heldN=first.filter(p=>p.v==='held').length;
+    html+=`<div class="rvlevel"><div class="rvhead">${L.title}<span class="rvscore">${heldN}/${first.length} 守住</span></div>`;
+    first.forEach((p,idx)=>{
+      const st=decideStages[idx]||{};
+      const tag=p.v==='held'?'<span class="rvtag held">守住</span>':p.v==='slip'?'<span class="rvtag slip">讓步</span>':'<span class="rvtag grey">留了縫</span>';
+      html+=`<div class="rvrow"><div class="rvq">${st.t?('〔'+st.t+'〕'):''}${st.q||''}</div><div class="rvans">${tag}<span class="rvlabel">「${p.label}」</span></div></div>`;
+    });
+    html+=`</div>`;
+  });
+  html+=`<div class="help" style="margin-top:18px;">回顧時建議的問法：不是「你為什麼選這個」，而是<b>「當下那一句，你心裡在想什麼？」</b>——讓對方說，不要急著糾正。</div>`;
+  html+=`<button class="btn ghost" onclick="quitToMenu()">回訊息列表</button>`;
+  debriefBody.innerHTML=html;
+  debrief.classList.add('show');
+}
+</script>
+</body>
+</html>
