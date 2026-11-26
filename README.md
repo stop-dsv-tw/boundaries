@@ -51,6 +51,8 @@
 
 本工具為個人製作，不代表任何機關立場。
 
+本網站使用 GoatCounter 進行匿名流量統計，不使用 cookie、不蒐集可識別個人的資料。
+
 ## 關於帳號名稱
 
 帳號名稱 stop-dsv-tw 中的 DSV 為數位性暴力（Digital Sexual Violence）。
